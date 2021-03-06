@@ -2,6 +2,14 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/juliovcruz/dijkstra v0.0.0-20210306135447-ae4b9572653c h1:Cj1P8gb7GyP34u5yy28JInXKh0WdTlc+ryWYL3b3y88=
 github.com/juliovcruz/dijkstra v0.0.0-20210306135447-ae4b9572653c/go.mod h1:5K+i0Ppa0byZTTV/gf2EXEeiq7RaSFz9F96ZjVR8yws=
+github.com/juliovcruz/dijkstra v1.0.0 h1:XXARLa4MI983DBk/VDIQvf83LclZBztUkU94SVLqjxk=
+github.com/juliovcruz/dijkstra v1.0.0/go.mod h1:5K+i0Ppa0byZTTV/gf2EXEeiq7RaSFz9F96ZjVR8yws=
+github.com/juliovcruz/dijkstra v1.0.1 h1:Q/WxiFCKx4hmKKYIgEEkwDrNMS8mF38boRUzLcS6G7E=
+github.com/juliovcruz/dijkstra v1.0.1/go.mod h1:5K+i0Ppa0byZTTV/gf2EXEeiq7RaSFz9F96ZjVR8yws=
+github.com/juliovcruz/dijkstra v1.0.2 h1:ZGb6UJilJ3rog/Y5UtJR7uSVJNeU91Fh3kmbxfA055A=
+github.com/juliovcruz/dijkstra v1.0.2/go.mod h1:5K+i0Ppa0byZTTV/gf2EXEeiq7RaSFz9F96ZjVR8yws=
+github.com/juliovcruz/dijkstra v1.0.3 h1:KaD5CcsZPu6HYRJCDPGnrYxxwgPedmwkwQNpJkRQD9M=
+github.com/juliovcruz/dijkstra v1.0.3/go.mod h1:5K+i0Ppa0byZTTV/gf2EXEeiq7RaSFz9F96ZjVR8yws=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
