@@ -10,7 +10,7 @@ import (
 )
 
 type CsvClient struct {
-	Path  string
+	Path   string
 	Routes []*models.Route
 }
 
@@ -28,7 +28,7 @@ func NewCsvClient(path string) (*CsvClient, error) {
 	}
 
 	return &CsvClient{
-		Path:  path,
+		Path:   path,
 		Routes: routes,
 	}, nil
 }

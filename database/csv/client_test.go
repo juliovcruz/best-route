@@ -3,16 +3,17 @@ package csv
 import (
 	"best-route/models"
 	"encoding/csv"
-	assert2 "github.com/stretchr/testify/assert"
 	"os"
 	"strings"
 	"testing"
+
+	assert2 "github.com/stretchr/testify/assert"
 )
 
-const PathTest = "../../input-routes_test.csv"
+const PathTest = "../../test-input-not-edit.csv"
 
 var (
-	client *CsvClient
+	client     *CsvClient
 	seedRoutes map[string]*models.Route
 )
 
@@ -64,7 +65,7 @@ func SeedRoutesToTest() []*models.Route {
 	return routes
 }
 
-func TestMain(m *testing.M){
+func TestMain(m *testing.M) {
 	os.Exit(func() int {
 		routes := SeedRoutesToTest()
 
