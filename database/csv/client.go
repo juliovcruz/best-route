@@ -33,7 +33,7 @@ func NewCsvClient(path string) (*CsvClient, error) {
 	}, nil
 }
 
-func (c *CsvClient) InsertOne(route *models.Route) (*models.Route, error) {
+func (c *CsvClient) InsertOneRoute(route *models.Route) (*models.Route, error) {
 	var lines [][]string
 
 	for _, r := range c.Routes {
@@ -60,6 +60,10 @@ func (c *CsvClient) InsertOne(route *models.Route) (*models.Route, error) {
 	c.Routes = append(c.Routes, route)
 
 	return route, err
+}
+
+func (c *CsvClient) GetAllRoutes() ([]*models.Route, error) {
+	return c.Routes, nil
 }
 
 func CsvReaderToRoutes(reader *csv.Reader) ([]*models.Route, error) {

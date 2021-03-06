@@ -1,25 +1,37 @@
 package main
 
 import (
-	"fmt"
+	"best-route/database"
+	"best-route/database/csv"
+	"log"
 	"os"
 )
 
+const path = "input-routes.csv"
+
 func main() {
 	if len(os.Args) > 1 {
-		fmt.Println(os.Args[1])
-		RunCLI()
+		csvClient, err := csv.NewCsvClient("./" + os.Args[1])
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if err := RunCLI(&database.Database{
+			Client: csvClient,
+		}); err != nil {
+			log.Fatal(err)
+		}
 		return
 	}
 
-	RunAPI()
-	return
-}
+	csvClient, err := csv.NewCsvClient("./" + path)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-func RunCLI() error {
-	return nil
-}
-
-func RunAPI() error {
-	return nil
+	if err := RunAPI(&database.Database{
+		Client: csvClient,
+	}); err != nil {
+		log.Fatal(err)
+	}
 }

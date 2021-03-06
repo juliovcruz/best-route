@@ -7,9 +7,9 @@ import (
 )
 
 type Route struct {
-	Start  string
-	Target string
-	Cost   int
+	Start  string `json:"start,omitempty"`
+	Target string `json:"target,omitempty"`
+	Cost   int    `json:"cost,omitempty"`
 }
 
 func (r *Route) ToString() []string {

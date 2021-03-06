@@ -103,7 +103,7 @@ func TestClient_InsertOne(t *testing.T) {
 	t.Run("already exists", func(t *testing.T) {
 		route := seedRoutes["GRU-BRC"]
 
-		r, err := client.InsertOne(route)
+		r, err := client.InsertOneRoute(route)
 
 		assert.Nil(r)
 
@@ -120,7 +120,7 @@ func TestClient_InsertOne(t *testing.T) {
 			Cost:   100,
 		}
 
-		r, err := client.InsertOne(route)
+		r, err := client.InsertOneRoute(route)
 
 		assert.NoError(err)
 
@@ -128,6 +128,20 @@ func TestClient_InsertOne(t *testing.T) {
 			assert.Equal(r.Start, route.Start)
 			assert.Equal(r.Target, route.Target)
 			assert.Equal(r.Cost, route.Cost)
+		}
+	})
+}
+
+func TestCsvClient_GetAllRoutes(t *testing.T) {
+	assert := assert2.New(t)
+
+	t.Run("success", func(t *testing.T) {
+		res, err := client.GetAllRoutes()
+
+		assert.NoError(err)
+
+		if assert.NotNil(res) {
+			res[0].Equal(seedRoutes["GRU-BRC"])
 		}
 	})
 }
