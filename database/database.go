@@ -4,6 +4,6 @@ import (
 	"best-route/models"
 )
 
-type DatabaseClient interface {
+type Client interface {
 	InsertOne(route *models.Route) (*models.Route, error)
 }
