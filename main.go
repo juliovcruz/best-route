@@ -3,6 +3,8 @@ package main
 import (
 	"best-route/database"
 	"best-route/database/csv"
+	"best-route/dijkstra"
+	"best-route/dijkstra/djk"
 	"log"
 	"os"
 )
@@ -16,9 +18,10 @@ func main() {
 			log.Fatal(err)
 		}
 
-		if err := RunCLI(&database.Database{
-			Client: csvClient,
-		}); err != nil {
+		if err := RunCLI(
+			&database.Database{Client: csvClient},
+			&dijkstra.Dijkstra{Client: djk.NewDjkClient()},
+		);	err != nil {
 			log.Fatal(err)
 		}
 		return
@@ -29,9 +32,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := RunAPI(&database.Database{
-		Client: csvClient,
-	}); err != nil {
+	if err := RunAPI(
+		&database.Database{Client: csvClient},
+		&dijkstra.Dijkstra{Client: djk.NewDjkClient()},
+	); err != nil {
 		log.Fatal(err)
 	}
 }

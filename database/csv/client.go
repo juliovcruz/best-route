@@ -22,7 +22,7 @@ func NewCsvClient(path string) (*CsvClient, error) {
 
 	reader := csv.NewReader(file)
 
-	routes, err := CsvReaderToRoutes(reader)
+	routes, err := csvReaderToRoutes(reader)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ func (c *CsvClient) GetAllRoutes() ([]*models.Route, error) {
 	return c.Routes, nil
 }
 
-func CsvReaderToRoutes(reader *csv.Reader) ([]*models.Route, error) {
+func csvReaderToRoutes(reader *csv.Reader) ([]*models.Route, error) {
 	var routes []*models.Route
 
 	for {
@@ -93,7 +93,7 @@ func CsvReaderToRoutes(reader *csv.Reader) ([]*models.Route, error) {
 	return routes, nil
 }
 
-func NewMockCsvClient(opts *CsvClient) (*CsvClient, error) {
+func newMockCsvClient(opts *CsvClient) (*CsvClient, error) {
 	var lines [][]string
 
 	file, err := os.Create(opts.Path)

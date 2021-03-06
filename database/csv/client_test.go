@@ -69,7 +69,7 @@ func TestMain(m *testing.M) {
 	os.Exit(func() int {
 		routes := SeedRoutesToTest()
 
-		c, err := NewMockCsvClient(&CsvClient{
+		c, err := newMockCsvClient(&CsvClient{
 			Path:   PathTest,
 			Routes: routes,
 		})
@@ -160,7 +160,7 @@ SCL,ORL,20
 `
 		reader := csv.NewReader(strings.NewReader(str))
 
-		res, err := CsvReaderToRoutes(reader)
+		res, err := csvReaderToRoutes(reader)
 
 		assert.NoError(err)
 

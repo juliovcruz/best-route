@@ -2,12 +2,12 @@ package main
 
 import (
 	"best-route/database"
-	"best-route/models"
+	"best-route/dijkstra"
 	"fmt"
 	"strings"
 )
 
-func RunCLI(db *database.Database) error {
+func RunCLI(db *database.Database, djk *dijkstra.Dijkstra) error {
 	for {
 		var route string
 
@@ -19,15 +19,15 @@ func RunCLI(db *database.Database) error {
 			return err
 		}
 
-		graph := models.ConvertManyRoutesToGraph(routes)
+		start, target := getBestRouteRequest(route)
 
-		bestRoute, cost, err := graph.Path(getBestRouteRequest(route))
+		res, err := djk.Client.BestRoute(start, target, routes)
 		if err != nil {
 			return err
 			// TODO: not found in graph
 		}
 
-		fmt.Printf("best route: %v > $%v", bestRoute, cost)
+		fmt.Printf("best route: %v > $%v\n", res.Route, res.Cost)
 	}
 }
 
