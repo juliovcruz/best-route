@@ -81,6 +81,21 @@ func TestMain(m *testing.M){
 	}())
 }
 
+func TestClient_NewCsvClient(t *testing.T) {
+	assert := assert2.New(t)
+
+	t.Run("already exists", func(t *testing.T) {
+		res, err := NewCsvClient(PathTest)
+
+		assert.NoError(err)
+
+		if assert.NotNil(res) {
+			assert.Equal(len(res.Routes), 7)
+			assert.Equal(res.Path, PathTest)
+		}
+	})
+}
+
 func TestClient_InsertOne(t *testing.T) {
 	assert := assert2.New(t)
 

@@ -92,13 +92,13 @@ func CsvReaderToRoutes(reader *csv.Reader) ([]*models.Route, error) {
 func NewMockCsvClient(opts *CsvClient) (*CsvClient, error) {
 	var lines [][]string
 
-	for _, r := range opts.Routes {
-		lines = append(lines, r.ToString())
-	}
-
 	file, err := os.Create(opts.Path)
 	if err != nil {
 		return nil, err
+	}
+
+	for _, r := range opts.Routes {
+		lines = append(lines, r.ToString())
 	}
 
 	w := csv.NewWriter(file)
