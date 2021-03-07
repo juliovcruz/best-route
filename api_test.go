@@ -73,7 +73,7 @@ func TestAPI_Insert(t *testing.T) {
 
 	t.Run("big place name", func(t *testing.T) {
 		route := &models.Route{
-			Start:  strings.Repeat("A", MaxSizePlaceName+1),
+			Start:  strings.Repeat("A", models.MaxSizePlaceName+1),
 			Target: "TO",
 			Cost:   10,
 		}
@@ -233,7 +233,7 @@ func TestAPI_BestRoute(t *testing.T) {
 
 	t.Run("big place name", func(t *testing.T) {
 		route := &models.Route{
-			Start:  strings.Repeat("A", MaxSizePlaceName+1),
+			Start:  strings.Repeat("A", models.MaxSizePlaceName+1),
 			Target: "TO",
 		}
 

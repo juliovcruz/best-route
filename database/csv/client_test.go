@@ -103,6 +103,26 @@ SCL,ORL,20
 			assert.True(res[0].Equal(seedRoutes["GRU-BRC"]))
 		}
 	})
+
+	t.Run("success with errors", func(t *testing.T) {
+		str := `GRU,BRC,ACA
+BRC,SCL,5
+GRU,CDG,75
+,SCL,20
+GRU,ORL,56
+ORL,CDG,5
+SCL,ORL,20
+`
+		reader := csv.NewReader(strings.NewReader(str))
+
+		res, err := csvReaderToRoutes(reader)
+
+		assert.NoError(err)
+
+		if assert.NotNil(res) {
+			assert.True(res[0].Equal(seedRoutes["BRC-SCL"]))
+		}
+	})
 }
 
 func TestMain(m *testing.M) {

@@ -17,7 +17,7 @@ type server struct {
 }
 
 func RunAPI(db *database.Database, djk *route_calculator.Router, addr string) error {
-	fmt.Printf("start api in localhost%v\n", addr)
+	fmt.Printf("api started in localhost%v\n", addr)
 
 	if err := startHandles(&server{
 		DatabaseClient: db.Client,
@@ -30,6 +30,7 @@ func RunAPI(db *database.Database, djk *route_calculator.Router, addr string) er
 }
 
 func startHandles(s *server) error {
+
 	http.HandleFunc("/add", s.handleInsert)
 	http.HandleFunc("/best", s.handleBestRoute)
 	return http.ListenAndServe(s.Addr, nil)
@@ -61,7 +62,7 @@ func (s *server) handleInsert(w http.ResponseWriter, r *http.Request) {
 
 	route = route.Trim()
 
-	if resErr := validateAPIInsertRequest(route); resErr != nil {
+	if resErr := models.ValidateInsertRequest(route); resErr != nil {
 		httpError(w, http.StatusPreconditionFailed, resErr)
 		return
 	}
@@ -111,7 +112,7 @@ func (s *server) handleBestRoute(w http.ResponseWriter, r *http.Request) {
 
 	route = route.Trim()
 
-	if resErr := validateAPIBestRouteRequest(route); resErr != nil {
+	if resErr := models.ValidateRequest(route); resErr != nil {
 		httpError(w, http.StatusPreconditionFailed, resErr)
 		return
 	}

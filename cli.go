@@ -2,6 +2,7 @@ package main
 
 import (
 	"best-route/database"
+	"best-route/models"
 	route_calculator "best-route/route_calculator"
 	"fmt"
 )
@@ -15,7 +16,7 @@ func RunCLI(db *database.Database, router *route_calculator.Router) error {
 		fmt.Println("please enter the route:")
 		fmt.Scanf("%s", &str)
 
-		route, resErr := validateCLIBestRouteRequest(str)
+		route, resErr := models.ValidateCLIBestRouteRequest(str)
 		if resErr != nil {
 			fmt.Printf("precondition failed: %v\n", resErr.ToString())
 			continue

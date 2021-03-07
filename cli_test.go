@@ -1,6 +1,7 @@
 package main
 
 import (
+	"best-route/models"
 	"fmt"
 	"strings"
 	"testing"
@@ -12,7 +13,7 @@ func TestCLI_validateCLIBestRouteRequest(t *testing.T) {
 	assert := assert2.New(t)
 
 	t.Run("not contains quotation marks", func(t *testing.T) {
-		route, resErr := validateCLIBestRouteRequest("GRUCDG")
+		route, resErr := models.ValidateCLIBestRouteRequest("GRUCDG")
 
 		assert.Nil(route)
 
@@ -22,7 +23,7 @@ func TestCLI_validateCLIBestRouteRequest(t *testing.T) {
 	})
 
 	t.Run("max size name", func(t *testing.T) {
-		route, resErr := validateCLIBestRouteRequest(fmt.Sprintf("%v-GRU", strings.Repeat("A", MaxSizePlaceName+1)))
+		route, resErr := models.ValidateCLIBestRouteRequest(fmt.Sprintf("%v-GRU", strings.Repeat("A", models.MaxSizePlaceName+1)))
 
 		assert.Nil(route)
 
@@ -32,7 +33,7 @@ func TestCLI_validateCLIBestRouteRequest(t *testing.T) {
 	})
 
 	t.Run("empty place name", func(t *testing.T) {
-		route, resErr := validateCLIBestRouteRequest("GRU-")
+		route, resErr := models.ValidateCLIBestRouteRequest("GRU-")
 
 		assert.Nil(route)
 
@@ -42,7 +43,7 @@ func TestCLI_validateCLIBestRouteRequest(t *testing.T) {
 	})
 
 	t.Run("success", func(t *testing.T) {
-		route, resErr := validateCLIBestRouteRequest("GRU-CDG")
+		route, resErr := models.ValidateCLIBestRouteRequest("GRU-CDG")
 
 		assert.Nil(resErr)
 

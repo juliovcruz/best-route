@@ -5,6 +5,7 @@ import (
 	"best-route/models"
 	"encoding/csv"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -32,6 +33,41 @@ func NewClient(path string) (*Client, error) {
 		Path:   path,
 		Routes: routes,
 	}, nil
+}
+
+func csvReaderToRoutes(reader *csv.Reader) ([]*models.Route, error) {
+	var routes []*models.Route
+
+	for {
+		record, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return nil, err
+		}
+
+		cost, err := strconv.Atoi(record[2])
+		if err != nil {
+			fmt.Printf("route not used because cost isn't a valid number, %v > %v $ %v\n error: %v\n", record[0], record[1], record[2], err.Error())
+			continue
+		}
+
+		route := &models.Route{
+			Start:  record[0],
+			Target: record[1],
+			Cost:   cost,
+		}
+
+		if resErr := models.ValidateInsertRequest(route); resErr != nil {
+			fmt.Printf("route not used because %v\n", resErr.Message)
+			continue
+		}
+
+		routes = append(routes, route)
+	}
+
+	return routes, nil
 }
 
 func (c *Client) InsertOneRoute(route *models.Route) (*models.Route, error) {
@@ -65,33 +101,6 @@ func (c *Client) InsertOneRoute(route *models.Route) (*models.Route, error) {
 
 func (c *Client) GetAllRoutes() ([]*models.Route, error) {
 	return c.Routes, nil
-}
-
-func csvReaderToRoutes(reader *csv.Reader) ([]*models.Route, error) {
-	var routes []*models.Route
-
-	for {
-		record, err := reader.Read()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return nil, err
-		}
-
-		cost, err := strconv.Atoi(record[2])
-		if err != nil {
-			return nil, err
-		}
-
-		routes = append(routes, &models.Route{
-			Start:  record[0],
-			Target: record[1],
-			Cost:   cost,
-		})
-	}
-
-	return routes, nil
 }
 
 func NewMockClient(opts *Client) (*Client, error) {

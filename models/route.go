@@ -6,6 +6,8 @@ import (
 	"strings"
 )
 
+const MaxSizePlaceName = 30
+
 type Route struct {
 	Start  string `json:"start"`
 	Target string `json:"target"`
