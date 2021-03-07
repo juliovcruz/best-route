@@ -2,35 +2,37 @@ package main
 
 import (
 	"best-route/database"
-	"best-route/models"
+	"best-route/router"
 	"fmt"
-	"strings"
 )
 
-func RunCLI(db *database.Database) error {
+func RunCLI(db *database.Database, router *router.Router) error {
+	fmt.Printf("| Example input: GRU-CDG -- To exit press CTRL+C |\n")
+
 	for {
-		var route string
+		var str string
 
 		fmt.Println("please enter the route:")
-		fmt.Scanf("%s", &route)
+		fmt.Scanf("%s", &str)
+
+		route, resErr := validateCLIBestRouteRequest(str)
+		if resErr != nil {
+			fmt.Printf("precondition failed: %v\n", resErr.ToString())
+			continue
+		}
 
 		routes, err := db.Client.GetAllRoutes()
 		if err != nil {
-			return err
+			fmt.Printf("internal error: %v\n", err.Error())
+			continue
 		}
 
-		graph := models.ConvertManyRoutesToGraph(routes)
-
-		bestRoute, cost, err := graph.Path(getBestRouteRequest(route))
-		if err != nil {
-			return err
-			// TODO: not found in graph
+		res, resErr := router.Client.BestRoute(route.Start, route.Target, routes)
+		if resErr != nil {
+			fmt.Printf("precondition failed: %v\n", resErr.ToString())
+			continue
 		}
 
-		fmt.Printf("best route: %v > $%v", bestRoute, cost)
+		fmt.Printf("best route: %v > $%v\n", res.Route, res.Cost)
 	}
-}
-
-func getBestRouteRequest(route string) (string, string) {
-	return strings.Split(route, "-")[0], strings.Split(route, "-")[1]
 }
