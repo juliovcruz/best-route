@@ -1,6 +1,7 @@
 package csv
 
 import (
+	"best-route/database"
 	"best-route/models"
 	"encoding/csv"
 	"errors"
@@ -9,12 +10,12 @@ import (
 	"strconv"
 )
 
-type CsvClient struct {
+type Client struct {
 	Path   string
 	Routes []*models.Route
 }
 
-func NewCsvClient(path string) (*CsvClient, error) {
+func NewClient(path string) (*Client, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -27,24 +28,24 @@ func NewCsvClient(path string) (*CsvClient, error) {
 		return nil, err
 	}
 
-	return &CsvClient{
+	return &Client{
 		Path:   path,
 		Routes: routes,
 	}, nil
 }
 
-func (c *CsvClient) InsertOneRoute(route *models.Route) (*models.Route, error) {
+func (c *Client) InsertOneRoute(route *models.Route) (*models.Route, error) {
 	var lines [][]string
 
 	for _, r := range c.Routes {
 		// check if already exists
 		if r.Equal(route) {
-			return nil, errors.New("this route already exists")
+			return nil, errors.New(database.AlreadyExistsMessageError)
 		}
 
-		lines = append(lines, r.ToString())
+		lines = append(lines, r.ToArray())
 	}
-	lines = append(lines, route.ToString())
+	lines = append(lines, route.ToArray())
 
 	file, err := os.Create(c.Path)
 	if err != nil {
@@ -62,7 +63,7 @@ func (c *CsvClient) InsertOneRoute(route *models.Route) (*models.Route, error) {
 	return route, err
 }
 
-func (c *CsvClient) GetAllRoutes() ([]*models.Route, error) {
+func (c *Client) GetAllRoutes() ([]*models.Route, error) {
 	return c.Routes, nil
 }
 
@@ -93,7 +94,7 @@ func csvReaderToRoutes(reader *csv.Reader) ([]*models.Route, error) {
 	return routes, nil
 }
 
-func NewMockCsvClient(opts *CsvClient) (*CsvClient, error) {
+func NewMockClient(opts *Client) (*Client, error) {
 	var lines [][]string
 
 	file, err := os.Create(opts.Path)
@@ -102,7 +103,7 @@ func NewMockCsvClient(opts *CsvClient) (*CsvClient, error) {
 	}
 
 	for _, r := range opts.Routes {
-		lines = append(lines, r.ToString())
+		lines = append(lines, r.ToArray())
 	}
 
 	w := csv.NewWriter(file)
@@ -111,7 +112,7 @@ func NewMockCsvClient(opts *CsvClient) (*CsvClient, error) {
 		return nil, err
 	}
 
-	return &CsvClient{
+	return &Client{
 		Path:   opts.Path,
 		Routes: opts.Routes,
 	}, nil

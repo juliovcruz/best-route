@@ -3,7 +3,7 @@ package main
 import (
 	"best-route/database"
 	"best-route/models"
-	"best-route/router"
+	route_calculator "best-route/route_calculator"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,12 +11,12 @@ import (
 )
 
 type server struct {
-	database.DatabaseClient
-	router.RouterClient
-	Addr string
+	DatabaseClient database.Client
+	RouterClient   route_calculator.Client
+	Addr           string
 }
 
-func RunAPI(db *database.Database, djk *router.Router, addr string) error {
+func RunAPI(db *database.Database, djk *route_calculator.Router, addr string) error {
 	fmt.Printf("start api in localhost%v\n", addr)
 
 	if err := startHandles(&server{
@@ -37,57 +37,49 @@ func startHandles(s *server) error {
 
 func (s *server) handleInsert(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", "wrong method, try again with POST"))
+		httpError(w, http.StatusMethodNotAllowed, &models.ResponseError{Message: "wrong method, try again with POST"})
 		return
 	}
 
 	if r.Body == nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", "body cannot be empty"))
+		httpError(w, http.StatusBadRequest, &models.ResponseError{Message: "body cannot be empty"})
 		return
 	}
 
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", fmt.Sprintf("%+v", err.Error())))
+		httpError(w, http.StatusInternalServerError, &models.ResponseError{Message: err.Error()})
 		return
 	}
 
 	var route *models.Route
 
 	if err := json.Unmarshal(reqBody, &route); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", fmt.Sprintf("%+v", err.Error())))
+		httpError(w, http.StatusInternalServerError, &models.ResponseError{Message: err.Error()})
 		return
 	}
 
 	route = route.Trim()
 
 	if resErr := validateAPIInsertRequest(route); resErr != nil {
-		w.WriteHeader(http.StatusPreconditionFailed)
-		fmt.Fprintf(w, "%+v", string(resErr.ToJSON()))
+		httpError(w, http.StatusPreconditionFailed, resErr)
 		return
 	}
 
 	res, err := s.DatabaseClient.InsertOneRoute(route)
 	if err != nil {
-		if err.Error() == "already exists" {
-			w.WriteHeader(http.StatusPreconditionFailed)
-			fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", fmt.Sprintf("%+v", err.Error())))
+		if err.Error() == database.AlreadyExistsMessageError {
+			httpError(w, http.StatusPreconditionFailed, &models.ResponseError{Message: err.Error()})
 			return
 		}
 
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", fmt.Sprintf("%+v", err.Error())))
+		httpError(w, http.StatusInternalServerError, &models.ResponseError{Message: err.Error()})
 		return
 	}
 
 	data, err := json.Marshal(res)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", fmt.Sprintf("%+v", err.Error())))
+		httpError(w, http.StatusInternalServerError, &models.ResponseError{Message: err.Error()})
 		return
 	}
 	fmt.Fprintf(w, "%+v", string(data))
@@ -95,59 +87,56 @@ func (s *server) handleInsert(w http.ResponseWriter, r *http.Request) {
 
 func (s *server) handleBestRoute(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", "wrong method, try again with GET"))
+		httpError(w, http.StatusMethodNotAllowed, &models.ResponseError{Message: "wrong method, try again with GET"})
 		return
 	}
 
 	if r.Body == nil {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", "body cannot be empty"))
+		httpError(w, http.StatusBadRequest, &models.ResponseError{Message: "body cannot be empty"})
 		return
 	}
 
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", fmt.Sprintf("%+v", err.Error())))
+		httpError(w, http.StatusInternalServerError, &models.ResponseError{Message: err.Error()})
 		return
 	}
 
 	var route *models.Route
 
 	if err := json.Unmarshal(reqBody, &route); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", fmt.Sprintf("%+v", err.Error())))
+		httpError(w, http.StatusInternalServerError, &models.ResponseError{Message: err.Error()})
 		return
 	}
 
 	route = route.Trim()
 
 	if resErr := validateAPIBestRouteRequest(route); resErr != nil {
-		w.WriteHeader(http.StatusPreconditionFailed)
-		fmt.Fprintf(w, "%+v", string(resErr.ToJSON()))
+		httpError(w, http.StatusPreconditionFailed, resErr)
 		return
 	}
 
 	routes, err := s.DatabaseClient.GetAllRoutes()
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", fmt.Sprintf("%+v", err.Error())))
+		httpError(w, http.StatusInternalServerError, &models.ResponseError{Message: err.Error()})
 		return
 	}
 
 	res, resErr := s.RouterClient.BestRoute(route.Start, route.Target, routes)
 	if resErr != nil {
-		w.WriteHeader(http.StatusPreconditionFailed)
-		fmt.Fprintf(w, "%+v", string(resErr.ToJSON()))
+		httpError(w, http.StatusPreconditionFailed, resErr)
 		return
 	}
 
 	data, err := json.Marshal(res)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprintf(w, "%+v", models.NewResponseErrorToJSON("", fmt.Sprintf("%+v", err.Error())))
+		httpError(w, http.StatusInternalServerError, &models.ResponseError{Message: err.Error()})
 		return
 	}
 	fmt.Fprintf(w, "%+v", string(data))
+}
+
+func httpError(w http.ResponseWriter, statusCode int, resErr *models.ResponseError) {
+	w.WriteHeader(statusCode)
+	fmt.Fprintf(w, "%+v", string(resErr.ToJSON()))
 }

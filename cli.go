@@ -2,11 +2,11 @@ package main
 
 import (
 	"best-route/database"
-	"best-route/router"
+	route_calculator "best-route/route_calculator"
 	"fmt"
 )
 
-func RunCLI(db *database.Database, router *router.Router) error {
+func RunCLI(db *database.Database, router *route_calculator.Router) error {
 	fmt.Printf("| Example input: GRU-CDG -- To exit press CTRL+C |\n")
 
 	for {
@@ -20,6 +20,7 @@ func RunCLI(db *database.Database, router *router.Router) error {
 			fmt.Printf("precondition failed: %v\n", resErr.ToString())
 			continue
 		}
+		route = route.Trim()
 
 		routes, err := db.Client.GetAllRoutes()
 		if err != nil {

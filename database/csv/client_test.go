@@ -13,15 +13,15 @@ import (
 const PathTest = "test-input-not-edit.csv"
 
 var (
-	client     *CsvClient
+	client     *Client
 	seedRoutes map[string]*models.Route
 )
 
-func TestClient_NewCsvClient(t *testing.T) {
+func TestClient_NewClient(t *testing.T) {
 	assert := assert2.New(t)
 
 	t.Run("already exists", func(t *testing.T) {
-		res, err := NewCsvClient("../../" + PathTest)
+		res, err := NewClient("../../" + PathTest)
 
 		assert.NoError(err)
 
@@ -67,7 +67,7 @@ func TestClient_InsertOne(t *testing.T) {
 	})
 }
 
-func TestCsvClient_GetAllRoutes(t *testing.T) {
+func TestClient_GetAllRoutes(t *testing.T) {
 	assert := assert2.New(t)
 
 	t.Run("success", func(t *testing.T) {
@@ -109,7 +109,7 @@ func TestMain(m *testing.M) {
 	os.Exit(func() int {
 		routes := SeedRoutesToTest()
 
-		c, err := NewMockCsvClient(&CsvClient{
+		c, err := NewMockClient(&Client{
 			Path:   "../../" + PathTest,
 			Routes: routes,
 		})

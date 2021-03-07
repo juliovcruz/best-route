@@ -4,11 +4,13 @@ import (
 	"best-route/models"
 )
 
+const AlreadyExistsMessageError = "this route already exists"
+
 type Database struct {
-	Client DatabaseClient
+	Client Client
 }
 
-type DatabaseClient interface {
+type Client interface {
 	GetAllRoutes() ([]*models.Route, error)
 	InsertOneRoute(route *models.Route) (*models.Route, error)
 }
