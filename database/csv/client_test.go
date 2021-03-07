@@ -10,12 +10,117 @@ import (
 	assert2 "github.com/stretchr/testify/assert"
 )
 
-const PathTest = "../../test-input-not-edit.csv"
+const PathTest = "test-input-not-edit.csv"
 
 var (
 	client     *CsvClient
 	seedRoutes map[string]*models.Route
 )
+
+func TestClient_NewCsvClient(t *testing.T) {
+	assert := assert2.New(t)
+
+	t.Run("already exists", func(t *testing.T) {
+		res, err := NewCsvClient("../../" + PathTest)
+
+		assert.NoError(err)
+
+		if assert.NotNil(res) {
+			assert.Equal(7, len(res.Routes))
+			assert.Equal("../../"+PathTest, res.Path)
+		}
+	})
+}
+
+func TestClient_InsertOne(t *testing.T) {
+	assert := assert2.New(t)
+
+	t.Run("already exists", func(t *testing.T) {
+		route := seedRoutes["GRU-BRC"]
+
+		r, err := client.InsertOneRoute(route)
+
+		assert.Nil(r)
+
+		if assert.Error(err) {
+			msg := err.Error()
+			assert.Contains(msg, "already exists")
+		}
+	})
+
+	t.Run("success", func(t *testing.T) {
+		route := &models.Route{
+			Start:  "GO",
+			Target: "TO",
+			Cost:   100,
+		}
+
+		r, err := client.InsertOneRoute(route)
+
+		assert.NoError(err)
+
+		if assert.NotNil(r) {
+			assert.Equal(route.Start, r.Start)
+			assert.Equal(route.Target, r.Target)
+			assert.Equal(route.Cost, r.Cost)
+		}
+	})
+}
+
+func TestCsvClient_GetAllRoutes(t *testing.T) {
+	assert := assert2.New(t)
+
+	t.Run("success", func(t *testing.T) {
+		res, err := client.GetAllRoutes()
+
+		assert.NoError(err)
+
+		if assert.NotNil(res) {
+			assert.GreaterOrEqual(len(res), 7)
+		}
+	})
+}
+
+func TestClient_CsvReaderToRoutes(t *testing.T) {
+	assert := assert2.New(t)
+
+	t.Run("success", func(t *testing.T) {
+		str := `GRU,BRC,10
+BRC,SCL,5
+GRU,CDG,75
+GRU,SCL,20
+GRU,ORL,56
+ORL,CDG,5
+SCL,ORL,20
+`
+		reader := csv.NewReader(strings.NewReader(str))
+
+		res, err := csvReaderToRoutes(reader)
+
+		assert.NoError(err)
+
+		if assert.NotNil(res) {
+			assert.True(res[0].Equal(seedRoutes["GRU-BRC"]))
+		}
+	})
+}
+
+func TestMain(m *testing.M) {
+	os.Exit(func() int {
+		routes := SeedRoutesToTest()
+
+		c, err := NewMockCsvClient(&CsvClient{
+			Path:   "../../" + PathTest,
+			Routes: routes,
+		})
+		if err != nil {
+			return 0
+		}
+
+		client = c
+		return m.Run()
+	}())
+}
 
 func SeedRoutesToTest() []*models.Route {
 	seedRoutes = map[string]*models.Route{
@@ -63,109 +168,4 @@ func SeedRoutesToTest() []*models.Route {
 	}
 
 	return routes
-}
-
-func TestMain(m *testing.M) {
-	os.Exit(func() int {
-		routes := SeedRoutesToTest()
-
-		c, err := newMockCsvClient(&CsvClient{
-			Path:   PathTest,
-			Routes: routes,
-		})
-		if err != nil {
-			return 0
-		}
-
-		client = c
-		return m.Run()
-	}())
-}
-
-func TestClient_NewCsvClient(t *testing.T) {
-	assert := assert2.New(t)
-
-	t.Run("already exists", func(t *testing.T) {
-		res, err := NewCsvClient(PathTest)
-
-		assert.NoError(err)
-
-		if assert.NotNil(res) {
-			assert.Equal(len(res.Routes), 7)
-			assert.Equal(res.Path, PathTest)
-		}
-	})
-}
-
-func TestClient_InsertOne(t *testing.T) {
-	assert := assert2.New(t)
-
-	t.Run("already exists", func(t *testing.T) {
-		route := seedRoutes["GRU-BRC"]
-
-		r, err := client.InsertOneRoute(route)
-
-		assert.Nil(r)
-
-		if assert.Error(err) {
-			msg := err.Error()
-			assert.Equal(msg, "already exists")
-		}
-	})
-
-	t.Run("success", func(t *testing.T) {
-		route := &models.Route{
-			Start:  "GO",
-			Target: "TO",
-			Cost:   100,
-		}
-
-		r, err := client.InsertOneRoute(route)
-
-		assert.NoError(err)
-
-		if assert.NotNil(r) {
-			assert.Equal(r.Start, route.Start)
-			assert.Equal(r.Target, route.Target)
-			assert.Equal(r.Cost, route.Cost)
-		}
-	})
-}
-
-func TestCsvClient_GetAllRoutes(t *testing.T) {
-	assert := assert2.New(t)
-
-	t.Run("success", func(t *testing.T) {
-		res, err := client.GetAllRoutes()
-
-		assert.NoError(err)
-
-		if assert.NotNil(res) {
-			res[0].Equal(seedRoutes["GRU-BRC"])
-		}
-	})
-}
-
-func TestClient_CsvReaderToRoutes(t *testing.T) {
-	assert := assert2.New(t)
-
-	t.Run("success", func(t *testing.T) {
-		str := `GRU,BRC,10
-BRC,SCL,5
-GRU,CDG,75
-GRU,SCL,20
-GRU,ORL,56
-ORL,CDG,5
-SCL,ORL,20
-`
-		reader := csv.NewReader(strings.NewReader(str))
-
-		res, err := csvReaderToRoutes(reader)
-
-		assert.NoError(err)
-
-		if assert.NotNil(res) {
-			res[0].Equal(seedRoutes["GRU-BRC"])
-		}
-	})
 }

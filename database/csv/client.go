@@ -39,7 +39,7 @@ func (c *CsvClient) InsertOneRoute(route *models.Route) (*models.Route, error) {
 	for _, r := range c.Routes {
 		// check if already exists
 		if r.Equal(route) {
-			return nil, errors.New("already exists")
+			return nil, errors.New("this route already exists")
 		}
 
 		lines = append(lines, r.ToString())
@@ -93,7 +93,7 @@ func csvReaderToRoutes(reader *csv.Reader) ([]*models.Route, error) {
 	return routes, nil
 }
 
-func newMockCsvClient(opts *CsvClient) (*CsvClient, error) {
+func NewMockCsvClient(opts *CsvClient) (*CsvClient, error) {
 	var lines [][]string
 
 	file, err := os.Create(opts.Path)

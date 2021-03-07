@@ -3,13 +3,16 @@ package main
 import (
 	"best-route/database"
 	"best-route/database/csv"
-	"best-route/dijkstra"
-	"best-route/dijkstra/djk"
+	"best-route/router"
+	"best-route/router/djk"
 	"log"
 	"os"
 )
 
-const path = "input-routes.csv"
+const (
+	path             = "input-routes.csv"
+	MaxSizePlaceName = 30
+)
 
 func main() {
 	if len(os.Args) > 1 {
@@ -20,8 +23,8 @@ func main() {
 
 		if err := RunCLI(
 			&database.Database{Client: csvClient},
-			&dijkstra.Dijkstra{Client: djk.NewDjkClient()},
-		);	err != nil {
+			&router.Router{Client: djk.NewDjkClient()},
+		); err != nil {
 			log.Fatal(err)
 		}
 		return
@@ -34,7 +37,8 @@ func main() {
 
 	if err := RunAPI(
 		&database.Database{Client: csvClient},
-		&dijkstra.Dijkstra{Client: djk.NewDjkClient()},
+		&router.Router{Client: djk.NewDjkClient()},
+		":3000",
 	); err != nil {
 		log.Fatal(err)
 	}
