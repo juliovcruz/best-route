@@ -1,41 +1,40 @@
-package main
+package models
 
 import (
-	"best-route/models"
 	"fmt"
 	"strings"
 )
 
-func validateRequest(route *models.Route) *models.ResponseError {
+func ValidateRequest(route *Route) *ResponseError {
 	if route == nil {
-		return &models.ResponseError{
+		return &ResponseError{
 			Message: "route is empty",
 		}
 	}
 
 	if len(route.Start) > MaxSizePlaceName {
-		return &models.ResponseError{
+		return &ResponseError{
 			Message: fmt.Sprintf("start place name is too big, max is %v characteres", MaxSizePlaceName),
 			Field:   "start",
 		}
 	}
 
 	if len(route.Target) > MaxSizePlaceName {
-		return &models.ResponseError{
+		return &ResponseError{
 			Message: fmt.Sprintf("target place name is too big, max is %v characteres", MaxSizePlaceName),
 			Field:   "target",
 		}
 	}
 
 	if len(route.Start) < 1 {
-		return &models.ResponseError{
+		return &ResponseError{
 			Message: "start place name is empty",
 			Field:   "start",
 		}
 	}
 
 	if len(route.Target) < 1 {
-		return &models.ResponseError{
+		return &ResponseError{
 			Message: "target place name is empty",
 			Field:   "target",
 		}
@@ -44,13 +43,13 @@ func validateRequest(route *models.Route) *models.ResponseError {
 	return nil
 }
 
-func validateAPIInsertRequest(route *models.Route) *models.ResponseError {
-	if err := validateRequest(route); err != nil {
+func ValidateInsertRequest(route *Route) *ResponseError {
+	if err := ValidateRequest(route); err != nil {
 		return err
 	}
 
 	if route.Cost < 0 {
-		return &models.ResponseError{
+		return &ResponseError{
 			Message: "cost cannot be negative",
 			Field:   "cost",
 		}
@@ -59,29 +58,21 @@ func validateAPIInsertRequest(route *models.Route) *models.ResponseError {
 	return nil
 }
 
-func validateAPIBestRouteRequest(route *models.Route) *models.ResponseError {
-	if err := validateRequest(route); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func validateCLIBestRouteRequest(str string) (*models.Route, *models.ResponseError) {
+func ValidateCLIBestRouteRequest(str string) (*Route, *ResponseError) {
 	if !strings.Contains(str, "-") {
-		return nil, &models.ResponseError{
+		return nil, &ResponseError{
 			Message: "places not separated by \"-\"",
 		}
 	}
 
 	split := strings.Split(str, "-")
 
-	route := &models.Route{
+	route := &Route{
 		Start:  split[0],
 		Target: split[1],
 	}
 
-	if err := validateRequest(route); err != nil {
+	if err := ValidateRequest(route); err != nil {
 		return nil, err
 	}
 

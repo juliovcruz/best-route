@@ -3,8 +3,8 @@ package main
 import (
 	"best-route/database/csv"
 	"best-route/models"
-	"best-route/router"
-	"best-route/router/djk"
+	"best-route/route_calculator"
+	"best-route/route_calculator/djk"
 	"bytes"
 	"encoding/json"
 	"log"
@@ -73,7 +73,7 @@ func TestAPI_Insert(t *testing.T) {
 
 	t.Run("big place name", func(t *testing.T) {
 		route := &models.Route{
-			Start:  strings.Repeat("A", MaxSizePlaceName+1),
+			Start:  strings.Repeat("A", models.MaxSizePlaceName+1),
 			Target: "TO",
 			Cost:   10,
 		}
@@ -233,7 +233,7 @@ func TestAPI_BestRoute(t *testing.T) {
 
 	t.Run("big place name", func(t *testing.T) {
 		route := &models.Route{
-			Start:  strings.Repeat("A", MaxSizePlaceName+1),
+			Start:  strings.Repeat("A", models.MaxSizePlaceName+1),
 			Target: "TO",
 		}
 
@@ -302,7 +302,7 @@ func TestAPI_BestRoute(t *testing.T) {
 		handler.ServeHTTP(res, req)
 
 		if assert.NotNil(res) {
-			var routeRes *router.BestRouteResponse
+			var routeRes *route_calculator.BestRouteResponse
 
 			err := json.Unmarshal(res.Body.Bytes(), &routeRes)
 			assert.NoError(err)
@@ -318,7 +318,7 @@ func TestMain(m *testing.M) {
 	os.Exit(func() int {
 		routes := SeedRoutesToTest()
 
-		csvClient, err := csv.NewMockCsvClient(&csv.CsvClient{
+		csvClient, err := csv.NewMockClient(&csv.Client{
 			Path:   "./" + PathTest,
 			Routes: routes,
 		})
@@ -328,7 +328,7 @@ func TestMain(m *testing.M) {
 
 		sv := &server{
 			DatabaseClient: csvClient,
-			RouterClient:   djk.NewDjkClient(),
+			RouterClient:   djk.NewClient(),
 			Addr:           ":3001",
 		}
 

@@ -1,20 +1,22 @@
 package csv
 
 import (
+	"best-route/database"
 	"best-route/models"
 	"encoding/csv"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strconv"
 )
 
-type CsvClient struct {
+type Client struct {
 	Path   string
 	Routes []*models.Route
 }
 
-func NewCsvClient(path string) (*CsvClient, error) {
+func NewClient(path string) (*Client, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -27,24 +29,59 @@ func NewCsvClient(path string) (*CsvClient, error) {
 		return nil, err
 	}
 
-	return &CsvClient{
+	return &Client{
 		Path:   path,
 		Routes: routes,
 	}, nil
 }
 
-func (c *CsvClient) InsertOneRoute(route *models.Route) (*models.Route, error) {
+func csvReaderToRoutes(reader *csv.Reader) ([]*models.Route, error) {
+	var routes []*models.Route
+
+	for {
+		record, err := reader.Read()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return nil, err
+		}
+
+		cost, err := strconv.Atoi(record[2])
+		if err != nil {
+			fmt.Printf("route not used because cost isn't a valid number, %v > %v $ %v\n error: %v\n", record[0], record[1], record[2], err.Error())
+			continue
+		}
+
+		route := &models.Route{
+			Start:  record[0],
+			Target: record[1],
+			Cost:   cost,
+		}
+
+		if resErr := models.ValidateInsertRequest(route); resErr != nil {
+			fmt.Printf("route not used because %v\n", resErr.Message)
+			continue
+		}
+
+		routes = append(routes, route)
+	}
+
+	return routes, nil
+}
+
+func (c *Client) InsertOneRoute(route *models.Route) (*models.Route, error) {
 	var lines [][]string
 
 	for _, r := range c.Routes {
 		// check if already exists
 		if r.Equal(route) {
-			return nil, errors.New("this route already exists")
+			return nil, errors.New(database.AlreadyExistsMessageError)
 		}
 
-		lines = append(lines, r.ToString())
+		lines = append(lines, r.ToArray())
 	}
-	lines = append(lines, route.ToString())
+	lines = append(lines, route.ToArray())
 
 	file, err := os.Create(c.Path)
 	if err != nil {
@@ -62,38 +99,11 @@ func (c *CsvClient) InsertOneRoute(route *models.Route) (*models.Route, error) {
 	return route, err
 }
 
-func (c *CsvClient) GetAllRoutes() ([]*models.Route, error) {
+func (c *Client) GetAllRoutes() ([]*models.Route, error) {
 	return c.Routes, nil
 }
 
-func csvReaderToRoutes(reader *csv.Reader) ([]*models.Route, error) {
-	var routes []*models.Route
-
-	for {
-		record, err := reader.Read()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			return nil, err
-		}
-
-		cost, err := strconv.Atoi(record[2])
-		if err != nil {
-			return nil, err
-		}
-
-		routes = append(routes, &models.Route{
-			Start:  record[0],
-			Target: record[1],
-			Cost:   cost,
-		})
-	}
-
-	return routes, nil
-}
-
-func NewMockCsvClient(opts *CsvClient) (*CsvClient, error) {
+func NewMockClient(opts *Client) (*Client, error) {
 	var lines [][]string
 
 	file, err := os.Create(opts.Path)
@@ -102,7 +112,7 @@ func NewMockCsvClient(opts *CsvClient) (*CsvClient, error) {
 	}
 
 	for _, r := range opts.Routes {
-		lines = append(lines, r.ToString())
+		lines = append(lines, r.ToArray())
 	}
 
 	w := csv.NewWriter(file)
@@ -111,7 +121,7 @@ func NewMockCsvClient(opts *CsvClient) (*CsvClient, error) {
 		return nil, err
 	}
 
-	return &CsvClient{
+	return &Client{
 		Path:   opts.Path,
 		Routes: opts.Routes,
 	}, nil

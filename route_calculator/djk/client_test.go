@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	client *DjkClient
+	client *Client
 	routes []*models.Route
 )
 
@@ -22,17 +22,20 @@ func TestClient_BestRoute(t *testing.T) {
 		assert.Nil(res)
 
 		if assert.NotNil(err) {
-			assert.Contains(err.Message, "cannot find target")
+			assert.Contains(err.Message, "cannot find AAA")
 		}
 	})
 
 	t.Run("start not found", func(t *testing.T) {
 		res, err := client.BestRoute("AAA", "CDG", routes)
 
+		r := routes
+
 		assert.Nil(res)
+		assert.NotNil(r)
 
 		if assert.NotNil(err) {
-			assert.Contains(err.Message, "cannot find start")
+			assert.Contains(err.Message, "cannot find AAA")
 		}
 	})
 
@@ -137,7 +140,7 @@ func TestMain(m *testing.M) {
 			},
 		}
 
-		client = NewDjkClient()
+		client = NewClient()
 		return m.Run()
 	}())
 }

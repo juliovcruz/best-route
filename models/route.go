@@ -6,10 +6,12 @@ import (
 	"strings"
 )
 
+const MaxSizePlaceName = 30
+
 type Route struct {
-	Start  string `json:"start,omitempty"`
-	Target string `json:"target,omitempty"`
-	Cost   int    `json:"cost,omitempty"`
+	Start  string `json:"start"`
+	Target string `json:"target"`
+	Cost   int    `json:"cost"`
 }
 
 func (r *Route) ToJSON() []byte {
@@ -17,14 +19,14 @@ func (r *Route) ToJSON() []byte {
 	return js
 }
 
-func (r *Route) ToString() []string {
-	return []string{strings.TrimSpace(r.Start), strings.TrimSpace(r.Target), fmt.Sprintf("%v", r.Cost)}
+func (r *Route) ToArray() []string {
+	return []string{strings.ToUpper(strings.TrimSpace(r.Start)), strings.ToUpper(strings.TrimSpace(r.Target)), fmt.Sprintf("%v", r.Cost)}
 }
 
 func (r *Route) Trim() *Route {
 	return &Route{
-		Start:  strings.TrimSpace(r.Start),
-		Target: strings.TrimSpace(r.Target),
+		Start:  strings.ToUpper(strings.TrimSpace(r.Start)),
+		Target: strings.ToUpper(strings.TrimSpace(r.Target)),
 		Cost:   r.Cost,
 	}
 }

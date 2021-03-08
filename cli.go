@@ -2,12 +2,16 @@ package main
 
 import (
 	"best-route/database"
-	"best-route/router"
+	"best-route/models"
+	"best-route/route_calculator"
 	"fmt"
+	"time"
 )
 
-func RunCLI(db *database.Database, router *router.Router) error {
-	fmt.Printf("| Example input: GRU-CDG -- To exit press CTRL+C |\n")
+func RunCLI(db *database.Database, router *route_calculator.Router) error {
+	time.Sleep(time.Millisecond * 5)
+
+	fmt.Printf("example input in CLI: GRU-CDG -- to exit press CTRL+C\n")
 
 	for {
 		var str string
@@ -15,11 +19,12 @@ func RunCLI(db *database.Database, router *router.Router) error {
 		fmt.Println("please enter the route:")
 		fmt.Scanf("%s", &str)
 
-		route, resErr := validateCLIBestRouteRequest(str)
+		route, resErr := models.ValidateCLIBestRouteRequest(str)
 		if resErr != nil {
 			fmt.Printf("precondition failed: %v\n", resErr.ToString())
 			continue
 		}
+		route = route.Trim()
 
 		routes, err := db.Client.GetAllRoutes()
 		if err != nil {
