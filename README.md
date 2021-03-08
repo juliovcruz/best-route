@@ -75,11 +75,11 @@ Para adicionar uma nova rota, envie uma requisição com método "POST" para o e
 Em caso de sucesso, a API retornará a rota que foi adicionada.
 
 ## Detalhes sobre o projeto e seu desenvolvimento
-Foi muito divertido desenvolver este desafio, principalmente quando me deparei com o problema e relembrei das aulas que já tive sobre um algoritmo em específico que soluciona o problema, o poderosíssimo Dijkstra, que calcula o menor caminho entre dois nós de um Grafo.
-Inicie pesquisando para estudar melhor sobre o algoritmo e encontrei uma biblioteca abandonada em específica que me chamou atenção, fiz um fork e concertei um problema que havia na validação dos nós que já pertenciam ao grafo, e utilizei esse fork para continuar o desafio.
-Para implementar o desafio decidi utilizar o mínimo de bibliotecas externas da linguagem, o resultado foi que o programa possui apenas duas dependências, o meu fork do algoritmo de Dijkstra e a biblioteca testify, que é uma preferência minha para implementar os testes.
-Decidi também manter o menos acoplado possível, principalmente a implementação para ler e inserir dados, que foi pensada para que possa ser feita uma nova implementação para um banco de dados por exemplo, sem afetar o restante do código.Da mesma maneira foi feito para a uma entidade chamada "route_calculator" na qual internamente está utilizando a implementação do algoritmo de Dijkstra, alterar a implementação seria algo "relativamente simples".
-Todo o código foi implementado pensando em testes unitários e mantendo uma responsabilidade mínima para cada método e entidade, para que possíveis refactors futuros fossem feitos com mais simplicidade.
+- Foi muito divertido desenvolver este desafio, principalmente quando me deparei com o problema e relembrei das aulas que já tive sobre um algoritmo em específico que soluciona o problema, o poderosíssimo Dijkstra, que calcula o menor caminho entre dois nós de um Grafo.
+- Inicie pesquisando para estudar melhor sobre o algoritmo e encontrei uma biblioteca abandonada em específica que me chamou atenção, fiz um fork e consertei um problema que havia na validação dos nós que já pertenciam ao grafo, e utilizei esse fork para continuar o desafio.
+- Para implementar o desafio decidi utilizar o mínimo de bibliotecas externas da linguagem, o resultado foi que o programa possui apenas duas dependências, o meu fork do algoritmo de Dijkstra e a biblioteca testify, que é uma preferência minha para implementar os testes.
+- Decidi também manter o menos acoplado possível, principalmente a implementação para ler e inserir dados, que foi pensada para que possa ser feita uma nova implementação para um banco de dados por exemplo, sem afetar o restante do código.Da mesma maneira foi feito para a uma entidade chamada "route_calculator" na qual internamente está utilizando a implementação do algoritmo de Dijkstra, alterar a implementação seria algo "relativamente simples".
+- Todo o código foi implementado pensando em testes unitários e mantendo uma responsabilidade mínima para cada método e entidade, para que possíveis refactors futuros fossem feitos com mais simplicidade.
 
 ### Estrutura de pacotes
 

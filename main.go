@@ -8,39 +8,48 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
+	"golang.org/x/sync/errgroup"
 )
 
 func main() {
-	var number int
-
 	if len(os.Args) > 1 {
+		var (
+			g errgroup.Group
+		)
+
 		csvClient, err := csv.NewClient("./" + os.Args[1])
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		for number != 1 && number != 2 {
-			fmt.Println("Choice one option:\n1 -- CLI\n2 -- API")
-			fmt.Scanf("%d", &number)
-		}
+		godotenv.Load()
+		port := os.Getenv("API_PORT")
 
-		if number == 1 {
+		g.Go(func() error {
+			if err := RunAPI(
+				&database.Database{Client: csvClient},
+				&route_calculator.Router{Client: djk.NewClient()},
+				":"+port,
+			); err != nil {
+				log.Fatal(err)
+			}
+			return nil
+		})
+
+		g.Go(func() error {
 			if err := RunCLI(
 				&database.Database{Client: csvClient},
 				&route_calculator.Router{Client: djk.NewClient()},
 			); err != nil {
 				log.Fatal(err)
 			}
+			return nil
+		})
+
+		if err := g.Wait(); err != nil {
 			return
-		}
-
-		if err := RunAPI(
-			&database.Database{Client: csvClient},
-			&route_calculator.Router{Client: djk.NewClient()},
-			":3000",
-		); err != nil {
-			log.Fatal(err)
-
 		}
 	}
 

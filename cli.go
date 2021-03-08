@@ -3,12 +3,15 @@ package main
 import (
 	"best-route/database"
 	"best-route/models"
-	route_calculator "best-route/route_calculator"
+	"best-route/route_calculator"
 	"fmt"
+	"time"
 )
 
 func RunCLI(db *database.Database, router *route_calculator.Router) error {
-	fmt.Printf("| Example input: GRU-CDG -- To exit press CTRL+C |\n")
+	time.Sleep(1000)
+
+	fmt.Printf("| example input: GRU-CDG -- to exit press CTRL+C |\n")
 
 	for {
 		var str string

@@ -3,7 +3,7 @@ package main
 import (
 	"best-route/database"
 	"best-route/models"
-	route_calculator "best-route/route_calculator"
+	"best-route/route_calculator"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
