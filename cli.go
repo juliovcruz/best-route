@@ -9,9 +9,9 @@ import (
 )
 
 func RunCLI(db *database.Database, router *route_calculator.Router) error {
-	time.Sleep(1000)
+	time.Sleep(time.Millisecond * 5)
 
-	fmt.Printf("| example input: GRU-CDG -- to exit press CTRL+C |\n")
+	fmt.Printf("example input in CLI: GRU-CDG -- to exit press CTRL+C\n")
 
 	for {
 		var str string
