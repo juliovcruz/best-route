@@ -24,7 +24,9 @@ func main() {
 			log.Fatal(err)
 		}
 
-		godotenv.Load()
+		if err := godotenv.Load(); err != nil {
+			log.Fatal(err)
+		}
 		port := os.Getenv("API_PORT")
 
 		g.Go(func() error {
